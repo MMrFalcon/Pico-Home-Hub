@@ -114,11 +114,11 @@ def serve(connection):
             switches.ledOn()
         elif request =='/lightoff?':
             switches.ledOff()
-        elif request =='/switch-one/on?':
+        elif request =='/switch-one/on':
             switches.switchOneOn()
             response = switches.reportSwitchState()
             print(response)
-        elif request =='/switch-one/off?':
+        elif request =='/switch-one/off':
             switches.switchOneOff()
             response = switches.reportSwitchState()
             print(response)
