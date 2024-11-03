@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.languageServer": "Pylance",
+		"picowgo.syncFolder": "",
+		"picowgo.openOnStart": true
+	}
+}
