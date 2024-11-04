@@ -60,16 +60,21 @@ class RequestMethod():
     PUT = _PUT()
     DELETE = _DELETE()
         
-class Request:
+class HttpRequest:
 
     responseType: ResponseType = ResponseType.HTML
     requestMethod: RequestMethod = RequestMethod.GET
+    endpoint: str = ''
 
     def __init__(self, requestString: str):
         self.responseType = self._getResponseType(requestString)
-        self.requestMethod = self._getRequestMethod(requestString)
+        print("# {}".format(requestString))
+        requestParts: list[str]= self._getRequestParts(requestString)
+        print("### {}".format(requestParts))
+        self.requestMethod = self._getRequestMethod(requestParts)
+        self.endpoint = self._getRequestEndpoint(requestParts)
 
-    def _getResponseType(request: str) -> ResponseType: 
+    def _getResponseType(self, request: str) -> ResponseType: 
         try:
             headerStart = request.find(response_type_header)
             if headerStart == -1:
@@ -92,10 +97,9 @@ class Request:
             print("An unexpected error occurred. Getting default response type.", e)
             return ResponseType.HTML
         
-    def _getRequestMethod(request: str) -> RequestMethod:
+    def _getRequestMethod(self, requestParts: list[str]) -> RequestMethod:
         try:
-            # First characters are b'GET ...b=0, '=1.
-            requestMethodString = request[1].split()[0].strip()
+            requestMethodString = requestParts[0].strip()
             print("Request method string: {}".format(requestMethodString))
 
             if (requestMethodString == RequestMethod.GET.getValue()):
@@ -117,3 +121,27 @@ class Request:
         except Exception as e:
             print("An unexpected error occurred. Getting default response type.", e)
             return ResponseType.HTML
+        
+    def _getRequestEndpoint(self, requestParts: list[str]) -> str:
+        try:
+            return requestParts[1]
+        except IndexError as e:
+            print("Error parsing the response type header, defaulting to empty string.", e)
+            return ''
+        except Exception as e:
+            print("An unexpected error occurred. Getting default response endpoint.", e)
+            return ''
+        
+    def _getRequestParts(self, requestString: str) -> list[str]:
+        try:
+            # First characters are b'GET ...b=0, '=1.
+            return requestString[2:].split()
+        except IndexError as e:
+            print("Error parsing the response type header, defaulting to ''.", e)
+            return ['']
+        except Exception as e:
+            print("An unexpected error occurred. Getting default response endpoint.", e)
+            return ['']
+        
+    def __str__(self):
+        return f"""{self.endpoint}, {self.requestMethod}, {self.responseType}"""
