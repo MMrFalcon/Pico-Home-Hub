@@ -2,34 +2,15 @@ import network
 import socket
 from time import sleep
 import machine
+import _thread
 import switches
 import config
 import request as http
+import wifi
 from request import ResponseType, RequestMethod, HttpRequest
 
-ssid = config.WIFI_SSID
-password = config.WIFI_PASSWORD
 # Available types: 1 - JSON, 2 - HTML
 response_type_header = "X-REPONSE-TYPE:"
-
-def connect():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.ifconfig((config.IP_ADDRESS, config.SUBNET_MASK, config.GATEWAY, config.DNS))
-    wlan.connect(ssid, password)
-    while wlan.isconnected() == False:
-        print('Waiting for connection...')
-        sleep(1)
-    print(wlan.ifconfig())
-    return wlan.ifconfig()[0]
-
-def openSocket(ip):
-    address = (ip, 80)
-    connection = socket.socket()
-    connection.bind(address)
-    connection.listen(1)
-    print(connection)
-    return connection
 
 # TODO read html with javascript from other file
 def webpage():
@@ -50,59 +31,88 @@ def webpage():
             """
     return str(html)
 
-def serve(connection):
-    switches.ledOff()
+def serve(wifiConnection: wifi.Wifi):
     while True:
-        # connection is a opened socket. Accept returns tuple: conn (new socket[0]), address 
-        client = connection.accept()[0]
-        print(client)
-        # Receive data from the socket as byte object max 1024 bytes.
-        requestBytes = client.recv(1024)
-        requestString = str(requestBytes)
-        print(requestString)
-        httpRequest: HttpRequest = http.HttpRequest(requestString)
-        print("Parsed request: {}".format(httpRequest))
-        response = ''
+        print("Waiting for client connections...")
+        # connection is an opened socket. Accept method returns tuple: conn which is(new socket[0]) and address 
+        # socket is blocking main thread, waiting for client connection.
+        # Library adds socketOpened.settimeout(5.0) to interrupt blocked thread and do other stuffs like
+        # check wifi connection.
+        try:   
+            wifiConnection.socketOpened.settimeout(5.0)
+            client = wifiConnection.socketOpened.accept()[0]
+            print(client)
+            # Receive data from the socket as byte object max 1024 bytes.
+            requestBytes = client.recv(1024)
+            requestString = str(requestBytes)
+            print(requestString)
+            httpRequest: HttpRequest = http.HttpRequest(requestString)
+            print("Parsed request: {}".format(httpRequest))
+            response = ''
 
-        if httpRequest.endpoint == '/lighton?':
-            switches.ledOn()
-        elif httpRequest.endpoint =='/lightoff?':
-            switches.ledOff()
-        elif httpRequest.endpoint =='/switch-one/on':
-            switches.switchOneOn()
-        elif httpRequest.endpoint =='/switch-one/off':
-            switches.switchOneOff()
-        elif httpRequest.endpoint =='/switch-two/on':
-            switches.switchTwoOn()
-        elif httpRequest.endpoint =='/switch-two/off':
-            switches.switchTwoOff()
-        elif httpRequest.endpoint =='/switch-three/on':
-            switches.switchThreeOn()
-        elif httpRequest.endpoint =='/switch-three/off':
-            switches.switchThreeOff()
-        elif httpRequest.endpoint =='/switch-report':
+            if httpRequest.endpoint == '/lighton?':
+                switches.ledOn()
+            elif httpRequest.endpoint =='/lightoff?':
+                switches.ledOff()
+            elif httpRequest.endpoint =='/switch-one/on':
+                switches.switchOneOn()
+            elif httpRequest.endpoint =='/switch-one/off':
+                switches.switchOneOff()
+            elif httpRequest.endpoint =='/switch-two/on':
+                switches.switchTwoOn()
+            elif httpRequest.endpoint =='/switch-two/off':
+                switches.switchTwoOff()
+            elif httpRequest.endpoint =='/switch-three/on':
+                switches.switchThreeOn()
+            elif httpRequest.endpoint =='/switch-three/off':
+                switches.switchThreeOff()
+            elif httpRequest.endpoint =='/switch-report':
+                pass
+
+            response = switches.reportSwitchState()
+
+            client.send("HTTP/1.1 200 OK\r\n")
+            if (httpRequest.responseType == ResponseType.HTML):
+                response = webpage()
+                client.send("Content-Type: text/html\r\n")
+            else:
+                client.send("Content-Type: json\r\n")
+
+            client.send("Content-Length: {}\r\n".format(len(response)))
+            client.send("\r\n")
+            client.send(response)
+            client.close()
+        except OSError as e:
+            print("OS error catched {}".format(e))
             pass
 
-        response = switches.reportSwitchState()
+        checkWifiConnection(wifiConnection)
 
-        client.send("HTTP/1.1 200 OK\r\n")
-        if (httpRequest.responseType == ResponseType.HTML):
-            response = webpage()
-            client.send("Content-Type: text/html\r\n")
+def checkWifiConnection(wifiConnection: wifi.Wifi):
+    try:
+        if wifiConnection.wlan.isconnected():
+            print("Wifi connected...")
         else:
-            client.send("Content-Type: json\r\n")
+            print("Wifi connection lost...")
+            wifiConnection.reconnect()
+    except Exception as e:
+        print("Connection error: {}".format(e))    
+        checkWifiConnection(wifiConnection)
+        
 
-        client.send("Content-Length: {}\r\n".format(len(response)))
-        client.send("\r\n")
-        client.send(response)
-        client.close()
+def checkWiFiConnectionInNewThread(wifiConnection: wifi.Wifi):
+        print("Check wifi in new thread")
+        wifiConnection.checkConnection()
 
+# Main program starts here
 try:
-    ip = connect()
-    connection  = openSocket(ip)
-    serve(connection)
-    while(1):
-        print("Waiting for tasks...")
-        sleep(5)
+    # TODO add gc.collect() ?
+    wifiConnection: wifi.Wifi = wifi.Wifi()
+    # print("Starting new thread job")
+    # threadIdentifier = _thread.start_new_thread(checkWiFiConnectionInNewThread, (wifiConnection,))
+    # print("Thread identifier: {}".format(threadIdentifier))
+    serve(wifiConnection)
 except KeyboardInterrupt:
-    machine.reset()
+    print("KeyboardInterrupt")
+finally:
+    wifiConnection.socketOpened.close()
