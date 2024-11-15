@@ -83,34 +83,15 @@ def serve(wifiConnection: wifi.Wifi):
             client.send(response)
             client.close()
         except OSError as e:
-            print("OS error catched {}".format(e))
+            print("OS error cached, it should be a timeout, for doing other stuffs between client requests: {}".format(e))
             pass
 
-        checkWifiConnection(wifiConnection)
-
-def checkWifiConnection(wifiConnection: wifi.Wifi):
-    try:
-        if wifiConnection.wlan.isconnected():
-            print("Wifi connected...")
-        else:
-            print("Wifi connection lost...")
-            wifiConnection.reconnect()
-    except Exception as e:
-        print("Connection error: {}".format(e))    
-        checkWifiConnection(wifiConnection)
-        
-
-def checkWiFiConnectionInNewThread(wifiConnection: wifi.Wifi):
-        print("Check wifi in new thread")
         wifiConnection.checkConnection()
 
 # Main program starts here
 try:
     # TODO add gc.collect() ?
     wifiConnection: wifi.Wifi = wifi.Wifi()
-    # print("Starting new thread job")
-    # threadIdentifier = _thread.start_new_thread(checkWiFiConnectionInNewThread, (wifiConnection,))
-    # print("Thread identifier: {}".format(threadIdentifier))
     serve(wifiConnection)
 except KeyboardInterrupt:
     print("KeyboardInterrupt")
