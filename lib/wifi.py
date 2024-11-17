@@ -3,6 +3,7 @@ import network
 import config
 import socket
 from time import sleep
+import machine
 
 ssid = config.WIFI_SSID
 password = config.WIFI_PASSWORD
@@ -15,7 +16,7 @@ class Wifi:
 
     def __init__(self):
         self._handleConnectToWiFi()
-        self._handleOpenSocket()
+        self.openSocket()
 
     """
     Method will try to connect to WiFi network by provided data in config.py.
@@ -40,34 +41,24 @@ class Wifi:
         print(self.wlan.ifconfig())
         return self.wlan.ifconfig()[0]
 
-    def openSocket(self) -> int:
+    """
+    Method will try to open the socket on port 80 and bind it to machine ip address.
+    If any exception occur, machine will restart to release all resource. 
+    After reboot main.py will be started again. 
+    """
+    def openSocket(self):
         try:
-            print("Try to open socket")
-            address = (self.ip, 80)
-            print("Creating socket")
-            socketTemp = socket.socket()
-            # self.socketOpened = socket.socket()
-            print("Binding address to the socket")
-            socketTemp.bind(address)
-            # self.socketOpened.bind(address)
-            print("Setting socket to listen")
-            socketTemp.listen(1)
-            # self.socketOpened.listen(1)
-            self.socketOpened = socketTemp
-            print(self.socketOpened)
-            return 0
+            self._delegateOpenSocket()
         except OSError as e:
-            # address in use
             print("OS error cached...")
             if e.errno == 98:
-                print("Error cached - address in use. Close socket before next operation.")
-                # soft reset for now
-                print("Try to close from module")
-                socket.close()
-                print("Try to close from class object")
-                self.socketOpened.close()
-                sleep(5) 
-                return -1
+                print("Error cached - address in use. Machine reset needed")
+                sleep(5)
+                machine.reset()
+            else:
+                print("Unknown error while trying to open socket. Machine reset needed")
+                sleep(5)
+                machine.reset()
 
     """
     Method will try to receive data from socket.
@@ -76,7 +67,9 @@ class Wifi:
     def isSocketOpened(self) -> bool:
         print("Checking socket state...")
         try:
-            self.socketOpened.accept()[0].recv(1024)
+            self.socketOpened.settimeout(1.5)
+            client = self.socketOpened.accept()[0].recv(1024)
+            client.close()
             print("Socket is open")
             return True
         except OSError as oe:
@@ -100,7 +93,7 @@ class Wifi:
             print("Wifi connection lost...")
             self._handleConnectToWiFi()
             if not self.isSocketOpened():
-                self._handleOpenSocket()
+                self.openSocket()
 
     def _handleConnectToWiFi(self):
         print("Request for handle connect to WiFi. Starting loop...")
@@ -111,12 +104,13 @@ class Wifi:
                 print("Connection error {}".format(ex))
                 pass
 
-    def _handleOpenSocket(self):
-        print("Request to handle: open socket")
-        statusCode = -1
-        tryCount = 0
-        # !!NOT STABLE!! - CANNOT CLOSE OPENED SOCKET AFTER KEYBOARD INTERRUPT. MACHINE MUST BE RESTARTED
-        while (statusCode != 0):
-            print("Status code for opening socket: {}, tryCount: {}".format(statusCode, tryCount))
-            tryCount += 1
-            statusCode = self.openSocket()
+    def _delegateOpenSocket(self):
+            print("Try to open socket")
+            address = (self.ip, 80)
+            print("Creating socket")
+            self.socketOpened = socket.socket()
+            print("Binding address to the socket")
+            self.socketOpened.bind(address)
+            print("Setting socket to listen")
+            self.socketOpened.listen(1)
+            print(self.socketOpened)

@@ -1,13 +1,10 @@
-import network
-import socket
+
 from time import sleep
-import machine
-import _thread
 import switches
-import config
 import request as http
 import wifi
-from request import ResponseType, RequestMethod, HttpRequest
+from request import ResponseType, HttpRequest
+import gc
 
 # Available types: 1 - JSON, 2 - HTML
 response_type_header = "X-REPONSE-TYPE:"
@@ -90,7 +87,9 @@ def serve(wifiConnection: wifi.Wifi):
 
 # Main program starts here
 try:
-    # TODO add gc.collect() ?
+    print("Starting app...")
+    gc.collect()
+    sleep(3)
     wifiConnection: wifi.Wifi = wifi.Wifi()
     serve(wifiConnection)
 except KeyboardInterrupt:
