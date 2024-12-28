@@ -6,6 +6,13 @@ import wifi
 from request import ResponseType, HttpRequest
 import gc
 
+# Redirect print output to a log file. Created for debugging in development mode only.
+def log_print(*args, **kwargs):
+    with open("log.txt", "a") as log_file: 
+        print(*args, **kwargs, file=log_file)
+        print(*args, **kwargs)
+
+
 # Available types: 1 - JSON, 2 - HTML
 response_type_header = "X-REPONSE-TYPE:"
 
@@ -63,7 +70,13 @@ def serve(wifiConnection: wifi.Wifi):
                 switches.switchThreeOn()
             elif httpRequest.endpoint =='/switch-three/off':
                 switches.switchThreeOff()
+            elif httpRequest.endpoint =='/switch-four/on':
+                switches.switchFourOn()
+            elif httpRequest.endpoint =='/switch-four/off':
+                switches.switchFourOff()
             elif httpRequest.endpoint =='/switch-report':
+                pass
+            else:
                 pass
 
             response = switches.reportSwitchState()
@@ -94,5 +107,7 @@ try:
     serve(wifiConnection)
 except KeyboardInterrupt:
     print("KeyboardInterrupt")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
 finally:
     wifiConnection.socketOpened.close()
