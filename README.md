@@ -103,14 +103,3 @@ The request method is an enum type implemented as a singleton with `str` values.
 - 2 - For the TEXT/HTML type <b>(default)</b>.
 
 The response type is stored in a variable named `responseType`. This variable is represented by an enum, also implemented as a singleton with str values.
-
-# 🚀 Roadmap
-Feature/Component	Status
-HTTP communication between Pico and server	✅ Implemented
-Support for basic sensors (e.g., DHT22, PIR)	✅ Implemented
-Domoticz integration on Raspberry Pi 4B	✅ Supported
-Server application using Spring Boot + MongoDB	🔄 In development
-Web UI for device control and monitoring	🔄 Planned
-MQTT protocol support (optional)	🔄 Planned
-OTA updates for Pico devices	🔄 Planned
-Secure communication (e.g., HTTPS/Token auth)	🔄 Planned
