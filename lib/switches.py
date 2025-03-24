@@ -40,7 +40,7 @@ def switchFourOff():
 
 def reportSwitchState():
     switchStates = {
-        "SWTICH_ONE": SWITCH_ONE.value(),
+        "SWITCH_ONE": SWITCH_ONE.value(),
         "SWITCH_TWO": SWITCH_TWO.value(),
         "SWITCH_THREE": SWITCH_THREE.value(),
         "SWITCH_FOUR": SWITCH_FOUR.value()

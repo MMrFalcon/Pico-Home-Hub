@@ -1,6 +1,6 @@
 
 # Available types: 1 - JSON, 2 - HTML
-response_type_header = "X-REPONSE-TYPE:"
+response_type_header = "X-RESPONSE-TYPE:"
 
 class ResponseType():
     class _JSON:
