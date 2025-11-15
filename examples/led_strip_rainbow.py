@@ -1,3 +1,4 @@
+# Script for WS2812B
 import machine, neopixel, time
 import math
 

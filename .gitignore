@@ -1,3 +1,8 @@
 config.py
 .vscode
 DS18B20_custom.py
+lcd_test.py
+.gitignore
+test.py
+lib/lcd_api.py
+lib/pico_i2c_lcd.py
