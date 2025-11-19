@@ -27,11 +27,11 @@ class DHT_Sensor:
         data = DHT_Data(self)
         return data.read()
 
-while(1):
-    # printData()
-    # sleep(2)
-    sensor = DHT_Sensor(0)
-    data: DHT_Data = sensor.get_data()
-    print(data.temperature + " (C)")
-    print(data.humidity + " %")
-    sleep(2)
+# while(1):
+#     # printData()
+#     # sleep(2)
+#     sensor = DHT_Sensor(0)
+#     data: DHT_Data = sensor.get_data()
+#     print(data.temperature + " (C)")
+#     print(data.humidity + " %")
+#     sleep(2)
