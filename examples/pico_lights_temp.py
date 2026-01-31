@@ -1,13 +1,13 @@
 
 import json
 from time import sleep
-import switches
-import request as http
-import wifi
-import DS18B20
-from request import HttpRequest
+import lib.switches as switches
+import lib.request as http
+import lib.wifi as wifi
+import lib.DS18B20 as DS18B20
+from lib.request import HttpRequest
 import gc
-import chipTemperature
+import lib.chipTemperature as chipTemperature
 
 # Available types: 1 - JSON, 2 - HTML
 response_type_header = "X-RESPONSE-TYPE:"

@@ -1,5 +1,6 @@
 
 import network
+# create config.py in the root folder
 import config
 import socket
 from time import sleep

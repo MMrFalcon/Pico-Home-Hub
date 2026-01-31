@@ -25,12 +25,12 @@ Returns:
 
 import json
 from time import sleep
-from screen_hd44780 import Hd44780
-import switches
-import request as http
-import wifi
-import DS18B20
-from request import HttpRequest
+from lib.screen_hd44780 import Hd44780
+import lib.switches as switches
+import lib.request as http
+import lib.wifi as wifi
+import lib.DS18B20 as DS18B20
+from lib.request import HttpRequest
 import gc
 from machine import Pin, I2C
 import sys
