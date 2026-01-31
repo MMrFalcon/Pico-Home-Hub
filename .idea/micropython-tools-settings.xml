@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="MicroPythonTools">
+    <option name="autoClearRepl" value="false" />
+    <option name="lastShownVersion" value="2026.1.1" />
     <option name="pluginEnabled" value="true" />
-    <option name="portName" />
+    <option name="portName" value="COM3" />
+    <option name="shouldAutoDetect" value="false" />
   </component>
 </project>
