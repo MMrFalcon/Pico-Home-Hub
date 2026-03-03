@@ -1,7 +1,7 @@
 # Example to display temperature, humidity and light level on SH1106 OLED display
-import DHT22
-import sh1106
-import oky16560
+import lib.DHT22 as DHT22
+import lib.sh1106 as sh1106
+import lib.oky16560 as oky16560
 from time import sleep
 from machine import Pin, I2C
 

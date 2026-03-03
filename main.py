@@ -1,11 +1,11 @@
 
 import json
 from time import sleep
-import switches
-import request as http
-import wifi
-import DS18B20
-from request import ResponseType, HttpRequest
+import lib.switches as switches
+import lib.request as http
+import lib.wifi as wifi
+import lib.DS18B20 as DS18B20
+from lib.request import ResponseType, HttpRequest
 import gc
 
 # Redirect print output to a log file. Created for debugging in development mode only.

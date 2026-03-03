@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="MicroPythonToolsStubs" type="python">
     <CLASSES>
-      <root url="file://$USER_HOME$/AppData/Local/micropython-tools-jetbrains/stubs/micropython-rp2-rpi_pico2-stubs_1.27.0" />
-      <root url="file://$USER_HOME$/AppData/Local/micropython-tools-jetbrains/stubs/micropython-rp2-rpi_pico2-stubs_1.27.0/stdlib" />
+      <root url="file://$USER_HOME$/Library/Application Support/micropython-tools-jetbrains/stubs/micropython-rp2-rpi_pico2_w-stubs_1.27.0" />
+      <root url="file://$USER_HOME$/Library/Application Support/micropython-tools-jetbrains/stubs/micropython-rp2-rpi_pico2_w-stubs_1.27.0/stdlib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
